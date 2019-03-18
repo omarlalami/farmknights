@@ -37,13 +37,7 @@ public class MonJoueur extends jeu.Joueur {
     	
     	
     	taille = etatDuJeu.donneGrillePourAstar().length;
-    	
-    	// dans le cas d'un PLATEAU_FK_PETIT on a une valeur de  etatDuJeu.donneGrillePourAstar().length  ==  20
-    	// dans le cas d'un PLATEAU_FK_DEFAUT on a une valeur de  etatDuJeu.donneGrillePourAstar().length  ==  8
-    	// je pense c'est plus interessant de mettre sa comme valeur
-    	// met ton avis ici
-    	
-    	
+
     	seuilVigeur = taille;
     	seuilVigeurUrgence = taille/2;
     	
