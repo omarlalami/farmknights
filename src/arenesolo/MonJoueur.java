@@ -16,7 +16,9 @@ import jeu.Plateau;
 
 public class MonJoueur extends jeu.Joueur {
 	
-	
+	public void affiche(String msg){
+		System.out.println(msg);
+	}
     
     public MonJoueur(String nom) { super(nom); }
     
@@ -46,18 +48,62 @@ public class MonJoueur extends jeu.Joueur {
     	// en cas d'urgence on cherche a gagner des pts vigueur avec
     	// des yourte ou joueurs peut importe
     	if( this.donneVigueur() <= vigeurUrgence) {
-    		
-        	listJoueurs = etatDuJeu.cherche(this.donnePosition(), taille, Plateau.CHERCHE_JOUEUR);
-        	
+          	
         	
         	
         	
     	}
-    	// en cas de niveau minimum on cherche des yourte
+    	// en cas de niveau minimum on cherche des yourte en evitant les joueurs
+    	
+    	
+    	
+    	/*
+    	 * 
+    	 * PARTIE DE OMAR PAS FINI
+    	 * 
+    	 * 
+    	 * 
+    	 * */
     	else if (this.donneVigueur() <= seuilleVigeur)
 		{
-				
-			
+    		listJoueurs = etatDuJeu.cherche(this.donnePosition(), taille, Plateau.CHERCHE_JOUEUR);
+    		
+    		int distance;
+    		int distanceLaPlusCourte=taille;// on suppose la distance la plus courte est la taille du jeu
+    		
+    		Iterator<Entry<Integer, ArrayList<Point>>> iterYourteGeneral;
+    		Iterator<Point> iterYourtPoints;
+    		Point Hill;
+    		
+    		Point HillLePlusProche;
+    		
+    		
+	    	iterYourteGeneral  = listYourt.entrySet().iterator();
+
+	    	affiche("Points où il y a des Yourt : ");
+	    	
+
+	    	// on recherche notre Yourt le plus proche
+	    	while (iterYourteGeneral.hasNext()) {
+	    		
+	    		iterYourtPoints = iterYourteGeneral.next().getValue().iterator();
+	    		
+	    		while(iterYourtPoints.hasNext()) {
+	    			
+	    			Hill = iterYourtPoints.next();
+	    			distance = etatDuJeu.donneCheminEntre(Hill, this.donnePosition()).size();
+	    			if( distance < distanceLaPlusCourte ) {
+	    				distanceLaPlusCourte = distance ;
+	    				HillLePlusProche = Hill;
+	    				//etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), HillLePlusProche, listJoueurs.getValue());
+	    			}
+	    		}
+    		
+	    	}
+	    	
+	    	
+	    	
+	    	
 		
 		}
     	// sinon par default on cherche a gagner des blobs/champs
