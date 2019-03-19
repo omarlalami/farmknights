@@ -35,9 +35,14 @@ public class AreneSolo {
     
     public static void main(String[] args) {
        // Plateau p = new Plateau( 100, PLATEAU_FK_PETIT);
-        Plateau p = new Plateau( 1200, MaitreDuJeuFK.PLATEAU_FK_DEFAUT);
+       // Plateau p = new Plateau( 1200, MaitreDuJeuFK.PLATEAU_FK_DEFAUT);
+        Plateau p = Plateau.generePlateauAleatoireFK(1000,20,4,20,100);
         MaitreDuJeuFK jeu = new MaitreDuJeuFK(p);
-        jeu.metJoueurEnPosition(0, new MonJoueur("Moi"));
+        jeu.metJoueurEnPosition(0, new MonJoueur("joueur 1"));
+        jeu.metJoueurEnPosition(1, new MonJoueur("joueur 2"));
+        jeu.metJoueurEnPosition(2, new MonJoueur("joueur 3"));
+        jeu.metJoueurEnPosition(3, new MonJoueur("joueur 4"));
+        
         FenetreDeJeuFK f = new FenetreDeJeuFK(jeu, true, true);
         f.log = new java.io.File("/tmp/toto.log");
         
