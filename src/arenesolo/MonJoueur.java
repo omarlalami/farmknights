@@ -6,113 +6,110 @@ package arenesolo;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.ListIterator;
-import java.util.Map.Entry;
+import java.util.Random;
 
 import jeu.Plateau;
 import jeu.astar.Node;
 
 public class MonJoueur extends jeu.Joueur {
+
+    
+
+	//controle le nombre de passage dans la yourt
+	int passagesDansYourt=0;
 	
-	public void affiche(String msg){
-		System.out.println(msg);
-	}
+	// determine si le joueur est dans la yourt , et doit ou non y rester
+	boolean estDansYourt=false;
+	
+
     
     public MonJoueur(String nom) { super(nom); }
-    
+
     @Override
     public Action faitUneAction(Plateau etatDuJeu) {
 
     	
-    	
-    	// ici on fait un test si on est dans une yourt on reste dessus juska atteindre  vigueur_max <= this.vieguer+5
-    	
-    	
-    	System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "+etatDuJeu.donneGrillePourAstar().length);
-
-    	int vigueur_max;
-    	int taillePlateau;  				//taille du plateau lxH
+    	int taillePlateau;  		//taille du plateau
     	int seuilVigeur;			//seuille de vigeur acceptable selon taille plateau 
-    	int seuilVigeurUrgence;			//seuille de vigeur d'urgence selon taille plateau 
+    	int diviseur=1;
     	
+  
+    	// on optimise notre algo car apres de nombreux test 
+    	//on s'est rendu compte que la meuilleur valeur du seuilVigueur est soit 'taillePlateau' diviser par 2 soit 'taillePlateau' sans etre diviser
+		Random r = new Random();
+		for(int i = 0 ; i<20 ; i++ ) {
+			diviseur = r.nextInt(2) + 1 ;
+		}
     	
+		
+		
+		
+		//recupération de la taille du plateau
     	taillePlateau = etatDuJeu.donneGrillePourAstar().length;
-
-    	vigueur_max=100;
-    	seuilVigeur = taillePlateau;
-    	seuilVigeurUrgence = taillePlateau/2; 
     	
+    	//initialisation seuil de vigeur
+    	seuilVigeur = taillePlateau/diviseur;    	
     	
-    	System.out.println("mon nom : " +this.donneNom());
-    	//System.out.println();
-    	
-    	
-    	
+    	//Récupération des fonctions utiles depuis la Class Utils
     	Utils utilitaire = new Utils();
     	
+    	
+    	//recupération des emplacements des champs, yourtes et joueurs
     	ArrayList<Node> listeChampAtteignable = utilitaire.objetsAccessible(this.donnePosition(),etatDuJeu,Plateau.CHERCHE_CHAMP);
     	ArrayList<Node> listeYourteAtteignable = utilitaire.objetsAccessible(this.donnePosition(),etatDuJeu,Plateau.CHERCHE_YOURTE);
     	ArrayList<Node> listeJoueurAtteignable = utilitaire.objetsAccessible(this.donnePosition(),etatDuJeu,Plateau.CHERCHE_JOUEUR);
     	
-    	HashMap<Integer, ArrayList<Point>> listJoueurs = new HashMap<Integer, ArrayList<Point>>();
-    	HashMap<Integer, ArrayList<Point>> listYourt = new HashMap<Integer, ArrayList<Point>>();
     	
-    	/*
-    	if( this.donneVigueur() <= seuilVigeurUrgence) {					// en cas d'urgence on cherche a gagner des pts vigueur avec des yourte ou joueurs (shifumi) peut importe
-          	
-    		affiche("notre joueur a atteint un niveau de seuil de vigueur necessitant de chercher un Yourt en n'evitant pas les joueurs");
-    		
-    		return utilitaire.ActionVigeurCritique(this.donnePosition(),listYourt, listJoueurs, taillePlateau, etatDuJeu);
 
-    	}
     	
-    	else*/ if (this.donneVigueur() <= seuilVigeur)    					// en cas de niveau minimum on cherche des yourte en evitant les joueurs
+    	// Permet permet de rester dans une yourte 2 tours
+    	if(estDansYourt) {
+    		
+    		if(passagesDansYourt==0) {
+	    		passagesDansYourt=1;
+	    		return Action.RIEN;
+    		}
+    		else{
+    			passagesDansYourt=0;
+    		}
+    	}
+
+	
+	
+    	if (this.donneVigueur() <= seuilVigeur)    					// en cas de niveau minimum on cherche des yourte en evitant les joueurs
 		{
-    		affiche("notre joueur a atteint un niveau de seuil de vigueur necessitant de chercher un Yourt en evitant les joueurs");
+    		utilitaire.affiche("notre joueur a atteint un niveau de seuil de vigueur necessitant de chercher un Yourt en evitant les joueurs");
         	
+    		// si on est dans le yourte
+    		estDansYourt=true;
+    		
+    		// on met le max afin de pouvoir comparer les points obtenus
     		int plus_court_chemin = taillePlateau;
     		Point prochain_point = null;
     		
+    		
+    		// on itere sur notre liste d'objet
         	for(Node n : listeYourteAtteignable) {
-        		System.out.println("yourt : "+n);
+
         		Point point = new Point(n.getPosX(),n.getPosY());
 
-        		ArrayList<Node> cheminSansContrainte = etatDuJeu.donneCheminEntre(this.donnePosition(),point);
-            	System.out.println(cheminSansContrainte);
-
             	ArrayList<Node> cheminAvecContrainteSupplementaires = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignable);
-            	System.out.println(cheminAvecContrainteSupplementaires);
             	
             	int taille = etatDuJeu.donneGrillePourAstar().length;
 
-            	
             	ArrayList<Node> listeJoueurAtteignableComplet = utilitaire.obstaclesSupplementairesPersonnel(this.donnePosition(),taille,listeJoueurAtteignable);
-           	
-            	System.out.println("**********");
-            	
-            	System.out.println("avant ajout obstacle : " +listeJoueurAtteignable);
-            	System.out.println("apre ajout obstacle : " +listeJoueurAtteignableComplet);
-            	
-            	System.out.println("**********");
            	
             	
             	ArrayList<Node> cheminAvecContrainteSupplementairesFinal = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignableComplet);
-            	System.out.println("Chemin Yourt sans eviter joueur : >"+cheminAvecContrainteSupplementaires);    
-            	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);   
+  
             	
             	if (cheminAvecContrainteSupplementaires !=null && cheminAvecContrainteSupplementairesFinal!=null) {
-                	
-		        	System.out.println("Chemin Yourt sans eviter joueur : >"+cheminAvecContrainteSupplementaires);    
-		        	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);    
+                	  
 		
 		        	if ( cheminAvecContrainteSupplementairesFinal.size() < plus_court_chemin && cheminAvecContrainteSupplementairesFinal!=null)
 		        	{
 		        		plus_court_chemin = cheminAvecContrainteSupplementairesFinal.size();
 		        		prochain_point = new Point(cheminAvecContrainteSupplementairesFinal.get(0).getPosX(),cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
-		        		System.out.println("test : "+cheminAvecContrainteSupplementairesFinal.get(0).getPosX()+" "+cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
 		        	}
 		        	
             	}
@@ -133,7 +130,10 @@ public class MonJoueur extends jeu.Joueur {
 		else
 		{
 			
-    		affiche("on cherche des champs");
+			// remet le compteur de passage dans yourt a 0
+			passagesDansYourt=0;
+			
+			utilitaire.affiche("on cherche des champs");
         	
     		int plus_court_chemin = taillePlateau;
     		Point prochain_point = null;
@@ -148,52 +148,35 @@ public class MonJoueur extends jeu.Joueur {
     			
     			int contenuCellule = etatDuJeu.	donneContenuCellule(n.getPosX(),n.getPosY());
     			
-    			if( etatDuJeu.contientUnChampQuiNeLuiAppartientPas(this,contenuCellule))
+    			if( Plateau.contientUnChampQuiNeLuiAppartientPas(this,contenuCellule))
     				listeChampAtteignableEtranger.add(n);
     		}
     		
     		
         	for(Node n : listeChampAtteignableEtranger) {
         		
-        		System.out.println("champ : "+n);
         		Point point = new Point(n.getPosX(),n.getPosY());
 
-        		ArrayList<Node> cheminSansContrainte = etatDuJeu.donneCheminEntre(this.donnePosition(),point);
-            	System.out.println(cheminSansContrainte);
-
             	ArrayList<Node> cheminAvecContrainteSupplementaires = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignable);
-            	System.out.println(cheminAvecContrainteSupplementaires);
             	
             	int taille = etatDuJeu.donneGrillePourAstar().length;
 
             	
             	ArrayList<Node> listeJoueurAtteignableComplet = utilitaire.obstaclesSupplementairesPersonnel(this.donnePosition(),taille,listeJoueurAtteignable);
            	
-            	System.out.println("**********");
-            	
-            	System.out.println("avant ajout obstacle : " +listeJoueurAtteignable);
-            	System.out.println("apre ajout obstacle : " +listeJoueurAtteignableComplet);
-            	
-            	System.out.println("**********");
-           	
+
             	
             	ArrayList<Node> cheminAvecContrainteSupplementairesFinal = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignableComplet);
             	
-            	System.out.println("chemin avec contrainte null ? : "+cheminAvecContrainteSupplementaires);
-            	System.out.println("chemin avec contrainte suplemntaire null ? : "+cheminAvecContrainteSupplementaires);
-            	
-            	
-            	
+
+          
             	if (cheminAvecContrainteSupplementaires !=null && cheminAvecContrainteSupplementairesFinal!=null) {
-            	
-		        	System.out.println("Chemin Yourt sans eviter joueur : >"+cheminAvecContrainteSupplementaires);    
-		        	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);    
+
 		
 		        	if ( cheminAvecContrainteSupplementairesFinal.size() < plus_court_chemin && cheminAvecContrainteSupplementairesFinal!=null)
 		        	{
 		        		plus_court_chemin = cheminAvecContrainteSupplementairesFinal.size();
 		        		prochain_point = new Point(cheminAvecContrainteSupplementairesFinal.get(0).getPosX(),cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
-		        		System.out.println("test : "+cheminAvecContrainteSupplementairesFinal.get(0).getPosX()+" "+cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
 		        	}
 		        	
             	}
@@ -201,10 +184,8 @@ public class MonJoueur extends jeu.Joueur {
             	
         	}
         	
-        	System.out.println("!!!!!!!!!!!!!!!!!!! plus court chemin : "+plus_court_chemin);
-        	System.out.println("!!!!!!!!!!!!!!!!!!! prochain point : "+prochain_point);
-        	
-        	System.out.println("test point : "+prochain_point);
+
+
         	if (prochain_point==null ||plus_court_chemin==100)
         		return super.faitUneAction(etatDuJeu);
         	

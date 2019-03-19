@@ -1,7 +1,5 @@
 package tests;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.awt.Point;
 
 import org.junit.jupiter.api.AfterAll;
@@ -16,7 +14,6 @@ import jeu.MaitreDuJeu;
 import jeu.MaitreDuJeuFK;
 import jeu.MaitreDuJeuListener;
 import jeu.Plateau;
-import jeu.MaitreDuJeuListener.Symboles;
 
 class AreneSoloTest {
 

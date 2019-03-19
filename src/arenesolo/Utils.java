@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import jeu.Joueur.Action;
 import jeu.Plateau;
@@ -33,7 +32,7 @@ public class Utils {
     public ArrayList<Node> objetsAccessible(Point pActuel, Plateau etatDuJeu,int cherche_object){
     
     	// notre liste qui contient nos objets @param cherche_object atteignable
-    	ArrayList<Node> listeObjetsAtteignable = new ArrayList();
+    	ArrayList<Node> listeObjetsAtteignable = new ArrayList<Node>();
     	
     	int taille = etatDuJeu.donneGrillePourAstar().length;
     	
@@ -51,9 +50,7 @@ public class Utils {
     	while (it.hasNext()) {
     		
     		Map.Entry<Integer, ArrayList<Point>> entry = it.next();
-    		
-    		Integer i = entry.getKey();
-    		
+    		    		
     		ArrayList<Point> al = entry.getValue();
     		
     		Iterator <Point> ital = al.iterator();
@@ -93,7 +90,7 @@ public class Utils {
 	 */
 	public ArrayList<Node> obstaclesSupplementairesPersonnel(Point posActuel, int taille, ArrayList<Node> obstacles){
 		
-		ArrayList<Node> obstaclesComplet = new ArrayList();
+		ArrayList<Node> obstaclesComplet = new ArrayList<Node>();
 		
 		for(Node n : obstacles) {
 			
