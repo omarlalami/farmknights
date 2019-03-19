@@ -27,6 +27,10 @@ public class MonJoueur extends jeu.Joueur {
     public Action faitUneAction(Plateau etatDuJeu) {
 
     	
+    	
+    	// ici on fait un test si on est dans une yourt on reste dessus juska atteindre  vigueur_max <= this.vieguer+5
+    	
+    	
     	System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "+etatDuJeu.donneGrillePourAstar().length);
 
     	int vigueur_max;
@@ -56,7 +60,7 @@ public class MonJoueur extends jeu.Joueur {
     	HashMap<Integer, ArrayList<Point>> listJoueurs = new HashMap<Integer, ArrayList<Point>>();
     	HashMap<Integer, ArrayList<Point>> listYourt = new HashMap<Integer, ArrayList<Point>>();
     	
-    	
+    	/*
     	if( this.donneVigueur() <= seuilVigeurUrgence) {					// en cas d'urgence on cherche a gagner des pts vigueur avec des yourte ou joueurs (shifumi) peut importe
           	
     		affiche("notre joueur a atteint un niveau de seuil de vigueur necessitant de chercher un Yourt en n'evitant pas les joueurs");
@@ -64,7 +68,8 @@ public class MonJoueur extends jeu.Joueur {
     		return utilitaire.ActionVigeurCritique(this.donnePosition(),listYourt, listJoueurs, taillePlateau, etatDuJeu);
 
     	}
-    	else if (this.donneVigueur() <= seuilVigeur)    					// en cas de niveau minimum on cherche des yourte en evitant les joueurs
+    	
+    	else*/ if (this.donneVigueur() <= seuilVigeur)    					// en cas de niveau minimum on cherche des yourte en evitant les joueurs
 		{
     		affiche("notre joueur a atteint un niveau de seuil de vigueur necessitant de chercher un Yourt en evitant les joueurs");
         	
@@ -96,16 +101,24 @@ public class MonJoueur extends jeu.Joueur {
             	
             	ArrayList<Node> cheminAvecContrainteSupplementairesFinal = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignableComplet);
             	System.out.println("Chemin Yourt sans eviter joueur : >"+cheminAvecContrainteSupplementaires);    
-            	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);    
-
-            	if ( cheminAvecContrainteSupplementairesFinal.size() < plus_court_chemin)
-            	{
-            		plus_court_chemin = cheminAvecContrainteSupplementairesFinal.size();
-            		prochain_point = new Point(cheminAvecContrainteSupplementairesFinal.get(0).getPosX(),cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
+            	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);   
+            	
+            	if (cheminAvecContrainteSupplementaires !=null && cheminAvecContrainteSupplementairesFinal!=null) {
+                	
+		        	System.out.println("Chemin Yourt sans eviter joueur : >"+cheminAvecContrainteSupplementaires);    
+		        	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);    
+		
+		        	if ( cheminAvecContrainteSupplementairesFinal.size() < plus_court_chemin && cheminAvecContrainteSupplementairesFinal!=null)
+		        	{
+		        		plus_court_chemin = cheminAvecContrainteSupplementairesFinal.size();
+		        		prochain_point = new Point(cheminAvecContrainteSupplementairesFinal.get(0).getPosX(),cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
+		        		System.out.println("test : "+cheminAvecContrainteSupplementairesFinal.get(0).getPosX()+" "+cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
+		        	}
+		        	
             	}
         	}
         	
-        	if (prochain_point==null)
+        	if (prochain_point==null ||plus_court_chemin==100)
         		return super.faitUneAction(etatDuJeu);
         	
         	Action prochaine_action= utilitaire.deplacement(this.donnePosition(), prochain_point);
@@ -165,18 +178,36 @@ public class MonJoueur extends jeu.Joueur {
            	
             	
             	ArrayList<Node> cheminAvecContrainteSupplementairesFinal = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignableComplet);
-            	System.out.println("Chemin Yourt sans eviter joueur : >"+cheminAvecContrainteSupplementaires);    
-            	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);    
-
-            	if ( cheminAvecContrainteSupplementairesFinal.size() < plus_court_chemin)
-            	{
-            		plus_court_chemin = cheminAvecContrainteSupplementairesFinal.size();
-            		prochain_point = new Point(cheminAvecContrainteSupplementairesFinal.get(0).getPosX(),cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
+            	
+            	System.out.println("chemin avec contrainte null ? : "+cheminAvecContrainteSupplementaires);
+            	System.out.println("chemin avec contrainte suplemntaire null ? : "+cheminAvecContrainteSupplementaires);
+            	
+            	
+            	
+            	if (cheminAvecContrainteSupplementaires !=null && cheminAvecContrainteSupplementairesFinal!=null) {
+            	
+		        	System.out.println("Chemin Yourt sans eviter joueur : >"+cheminAvecContrainteSupplementaires);    
+		        	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);    
+		
+		        	if ( cheminAvecContrainteSupplementairesFinal.size() < plus_court_chemin && cheminAvecContrainteSupplementairesFinal!=null)
+		        	{
+		        		plus_court_chemin = cheminAvecContrainteSupplementairesFinal.size();
+		        		prochain_point = new Point(cheminAvecContrainteSupplementairesFinal.get(0).getPosX(),cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
+		        		System.out.println("test : "+cheminAvecContrainteSupplementairesFinal.get(0).getPosX()+" "+cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
+		        	}
+		        	
             	}
+            	
+            	
         	}
         	
-        	if (prochain_point==null)
+        	System.out.println("!!!!!!!!!!!!!!!!!!! plus court chemin : "+plus_court_chemin);
+        	System.out.println("!!!!!!!!!!!!!!!!!!! prochain point : "+prochain_point);
+        	
+        	System.out.println("test point : "+prochain_point);
+        	if (prochain_point==null ||plus_court_chemin==100)
         		return super.faitUneAction(etatDuJeu);
+        	
         	
         	Action prochaine_action= utilitaire.deplacement(this.donnePosition(), prochain_point);
         	

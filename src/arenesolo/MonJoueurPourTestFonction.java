@@ -14,8 +14,9 @@ import jeu.Plateau;
 import jeu.astar.AStar;
 import jeu.astar.Node;
 import jeu.Joueur.Action;
+import arenesolo.Utils;
 
-
+import arenesolo.Utils;
 
 
 public class MonJoueurPourTestFonction extends jeu.Joueur {
@@ -89,56 +90,16 @@ public class MonJoueurPourTestFonction extends jeu.Joueur {
 		return obstaclesComplet;
 	}
 	
-	/* les points de notre map accessible, c'est a dire sans arbres sur notre chemin
-	 * ( prend en compte le cas des objets dans des zones infranchissable )
-	 * 
-	 * @param etatDuJeu
-	 * 
-	 * @param cherche_object : noter objet Plateau.CHERCHE_CHAMP ....
-	 * 
-	 * @return une ArrayList des objets atteignable 
-	 */
-	
-    public ArrayList<Node> objetsAccessible(Plateau etatDuJeu,int cherche_object){
+
     
-    	int taille = etatDuJeu.donneGrillePourAstar().length;
-    	
-    	HashMap<Integer, ArrayList<Point>> list = etatDuJeu.cherche(this.donnePosition(), taille, cherche_object);
-		
-    	Iterator<Map.Entry<Integer, ArrayList<Point>>> it = list.entrySet().iterator();
-
-    	ArrayList<Node> listeObjetsAtteignable = new ArrayList();
-    	
-    	while (it.hasNext()) {
-    		Map.Entry<Integer, ArrayList<Point>> entry = it.next();
-    		
-    		Integer i = entry.getKey();
-    		ArrayList<Point> al = entry.getValue();
-    		
-    		Iterator <Point> ital = al.iterator();
-    		while (ital.hasNext()) {
-    			Point p = ital.next();
-    			
-    			ArrayList<Node> chemin = etatDuJeu.donneCheminEntre(this.donnePosition(), p);
-    			if(chemin!=null) {
-	    			int x = p.x;
-	    			int y = p.y;
-	    			//if(this.donnePosition().getX()!=x && this.donnePosition().getY()!=y) // on n'ajoute pas la position actuel comme obstacle
-	    				listeObjetsAtteignable.add(new Node(x, y));
-    			}
-       		}
-    	    			
-    	}
-
-    	return listeObjetsAtteignable;
-    }
     
     @Override
     public Action faitUneAction(Plateau etatDuJeu) {
+    	Utils utilitaire = new Utils();
     	
-    	ArrayList<Node> listeChampAtteignable = objetsAccessible(etatDuJeu,Plateau.CHERCHE_CHAMP);
-    	ArrayList<Node> listeYourteAtteignable = objetsAccessible(etatDuJeu,Plateau.CHERCHE_YOURTE);
-    	ArrayList<Node> listeJoueurAtteignable = objetsAccessible(etatDuJeu,Plateau.CHERCHE_JOUEUR);
+    	ArrayList<Node> listeChampAtteignable = utilitaire.objetsAccessible(this.donnePosition(),etatDuJeu,Plateau.CHERCHE_CHAMP);
+    	ArrayList<Node> listeYourteAtteignable = utilitaire.objetsAccessible(this.donnePosition(),etatDuJeu,Plateau.CHERCHE_YOURTE);
+    	ArrayList<Node> listeJoueurAtteignable = utilitaire.objetsAccessible(this.donnePosition(),etatDuJeu,Plateau.CHERCHE_JOUEUR);
     	
     	System.out.println("champ : ");
     	for(Node n : listeChampAtteignable) {
@@ -169,7 +130,7 @@ public class MonJoueurPourTestFonction extends jeu.Joueur {
         	int taille = etatDuJeu.donneGrillePourAstar().length;
 
         	
-        	ArrayList<Node> listeJoueurAtteignableComplet = obstaclesSupplementairesPersonnel(this.donnePosition(),taille,listeJoueurAtteignable);
+        	ArrayList<Node> listeJoueurAtteignableComplet = this.obstaclesSupplementairesPersonnel(this.donnePosition(),taille,listeJoueurAtteignable);
        	
         	System.out.println("**********");
         	
@@ -180,7 +141,8 @@ public class MonJoueurPourTestFonction extends jeu.Joueur {
        	
         	
         	ArrayList<Node> cheminAvecContrainteSupplementairesFinal = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignableComplet);
-        	System.out.println(cheminAvecContrainteSupplementaires);    
+        	System.out.println(">"+cheminAvecContrainteSupplementaires);    
+        	System.out.println(">>"+cheminAvecContrainteSupplementairesFinal);    
 
     	}
     	
