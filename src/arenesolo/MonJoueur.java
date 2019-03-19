@@ -13,6 +13,7 @@ import java.util.ListIterator;
 import java.util.Map.Entry;
 
 import jeu.Plateau;
+import jeu.astar.Node;
 
 public class MonJoueur extends jeu.Joueur {
 	
@@ -25,135 +26,168 @@ public class MonJoueur extends jeu.Joueur {
     @Override
     public Action faitUneAction(Plateau etatDuJeu) {
 
+    	
     	System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "+etatDuJeu.donneGrillePourAstar().length);
-    	
-    	HashMap<Integer, ArrayList<Point>> listJoueurs = new HashMap<Integer, ArrayList<Point>>();
-    	HashMap<Integer, ArrayList<Point>> listYourt = new HashMap<Integer, ArrayList<Point>>();
-    	HashMap<Integer, ArrayList<Point>> listChamps = new HashMap<Integer, ArrayList<Point>>();
-    	
-    	int taille;  				//taille du plateau lxH
+
+    	int vigueur_max;
+    	int taillePlateau;  				//taille du plateau lxH
     	int seuilVigeur;			//seuille de vigeur acceptable selon taille plateau 
     	int seuilVigeurUrgence;			//seuille de vigeur d'urgence selon taille plateau 
     	
     	
-    	taille = etatDuJeu.donneGrillePourAstar().length;
+    	taillePlateau = etatDuJeu.donneGrillePourAstar().length;
 
-    	seuilVigeur = taille;
-    	seuilVigeurUrgence = taille/2;
+    	vigueur_max=100;
+    	seuilVigeur = taillePlateau;
+    	seuilVigeurUrgence = taillePlateau/2; 
     	
-    	listYourt = etatDuJeu.cherche(this.donnePosition(), taille, Plateau.CHERCHE_YOURTE);
-    	listChamps = etatDuJeu.cherche(this.donnePosition(), taille, Plateau.CHERCHE_CHAMP);
     	
-
-
-       
+    	System.out.println("mon nom : " +this.donneNom());
+    	//System.out.println();
     	
+    	
+    	
+    	Utils utilitaire = new Utils();
+    	
+    	ArrayList<Node> listeChampAtteignable = utilitaire.objetsAccessible(this.donnePosition(),etatDuJeu,Plateau.CHERCHE_CHAMP);
+    	ArrayList<Node> listeYourteAtteignable = utilitaire.objetsAccessible(this.donnePosition(),etatDuJeu,Plateau.CHERCHE_YOURTE);
+    	ArrayList<Node> listeJoueurAtteignable = utilitaire.objetsAccessible(this.donnePosition(),etatDuJeu,Plateau.CHERCHE_JOUEUR);
+    	
+    	HashMap<Integer, ArrayList<Point>> listJoueurs = new HashMap<Integer, ArrayList<Point>>();
+    	HashMap<Integer, ArrayList<Point>> listYourt = new HashMap<Integer, ArrayList<Point>>();
     	
     	
     	if( this.donneVigueur() <= seuilVigeurUrgence) {					// en cas d'urgence on cherche a gagner des pts vigueur avec des yourte ou joueurs (shifumi) peut importe
           	
-        	
-        	
-        	
+    		affiche("notre joueur a atteint un niveau de seuil de vigueur necessitant de chercher un Yourt en n'evitant pas les joueurs");
+    		
+    		return utilitaire.ActionVigeurCritique(this.donnePosition(),listYourt, listJoueurs, taillePlateau, etatDuJeu);
+
     	}
-    	else if (this.donneVigueur() <= seuilVigeur)    																	// en cas de niveau minimum on cherche des yourte en evitant les joueurs
+    	else if (this.donneVigueur() <= seuilVigeur)    					// en cas de niveau minimum on cherche des yourte en evitant les joueurs
 		{
-    		affiche("notre joueur a atteint un niveau de seuil de vigueur necessitant de chercher un Yourt");
+    		affiche("notre joueur a atteint un niveau de seuil de vigueur necessitant de chercher un Yourt en evitant les joueurs");
+        	
+    		int plus_court_chemin = taillePlateau;
+    		Point prochain_point = null;
     		
-    		
-    		
-    		/*
-    		 * on recupere nos Yourt ( en haut )
-    		 * 
-    		 * 
-    		 * a chaque tour : 
-    		 * 
-    		 * on regarde lequel est le plus proche
-    		 * 
-    		 * 
-    		 * on cherche le meuilleur chemin tout en evitant les joueurs
-    		 * 
-    		 * on recupere le premier point de ce chemin et on y avance !
-    		 * 
-    		 * */
-    		
-    		
-    		
-    		
-    		
-    		listJoueurs = etatDuJeu.cherche(this.donnePosition(), taille, Plateau.CHERCHE_JOUEUR);
-    		
-    		int distance;
-    		int distanceLaPlusCourte=taille;											// on suppose que la distance la plus courte est la taille du cote du plateau jeu ( le plateau est un carre )
-    		
-    		Iterator<Entry<Integer, ArrayList<Point>>> iterYourteGeneral;
-    		Iterator<Point> iterYourtPoints;
-    		Point Hill;
-    		
-    		Point HillLePlusProche;
-    		
-    		
-	    	iterYourteGeneral  = listYourt.entrySet().iterator();
+        	for(Node n : listeYourteAtteignable) {
+        		System.out.println("yourt : "+n);
+        		Point point = new Point(n.getPosX(),n.getPosY());
 
-	    	affiche("Points où il y a des Yourt : ");
-	    	
+        		ArrayList<Node> cheminSansContrainte = etatDuJeu.donneCheminEntre(this.donnePosition(),point);
+            	System.out.println(cheminSansContrainte);
 
-	    	// on recherche notre Yourt le plus proche
-	    	while (iterYourteGeneral.hasNext()) {
-	    		
-	    		iterYourtPoints = iterYourteGeneral.next().getValue().iterator();
-	    		
-	    		while(iterYourtPoints.hasNext()) {
-	    			
-	    			Hill = iterYourtPoints.next();
-	    			distance = etatDuJeu.donneCheminEntre(Hill, this.donnePosition()).size();
-	    			if( distance < distanceLaPlusCourte ) {
-	    				distanceLaPlusCourte = distance ;
-	    				HillLePlusProche = Hill;
-	    				//etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), HillLePlusProche, listJoueurs.getValue());
-	    			}
-	    		}
-    		
-	    	}
-	    	
-	    	
-	    	
-	    	
-		
+            	ArrayList<Node> cheminAvecContrainteSupplementaires = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignable);
+            	System.out.println(cheminAvecContrainteSupplementaires);
+            	
+            	int taille = etatDuJeu.donneGrillePourAstar().length;
+
+            	
+            	ArrayList<Node> listeJoueurAtteignableComplet = utilitaire.obstaclesSupplementairesPersonnel(this.donnePosition(),taille,listeJoueurAtteignable);
+           	
+            	System.out.println("**********");
+            	
+            	System.out.println("avant ajout obstacle : " +listeJoueurAtteignable);
+            	System.out.println("apre ajout obstacle : " +listeJoueurAtteignableComplet);
+            	
+            	System.out.println("**********");
+           	
+            	
+            	ArrayList<Node> cheminAvecContrainteSupplementairesFinal = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignableComplet);
+            	System.out.println("Chemin Yourt sans eviter joueur : >"+cheminAvecContrainteSupplementaires);    
+            	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);    
+
+            	if ( cheminAvecContrainteSupplementairesFinal.size() < plus_court_chemin)
+            	{
+            		plus_court_chemin = cheminAvecContrainteSupplementairesFinal.size();
+            		prochain_point = new Point(cheminAvecContrainteSupplementairesFinal.get(0).getPosX(),cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
+            	}
+        	}
+        	
+        	if (prochain_point==null)
+        		return super.faitUneAction(etatDuJeu);
+        	
+        	Action prochaine_action= utilitaire.deplacement(this.donnePosition(), prochain_point);
+        	
+        	if(prochaine_action !=null)
+        		return prochaine_action;
+        	else
+        		return super.faitUneAction(etatDuJeu);
+
 		}
-    	// sinon par default on cherche a gagner des blobs/champs
+    	// sinon par default on cherche a gagner des blobs/champs en evitant les joueurs
 		else
 		{
 			
-			
-    	
-	    	HashMap<Integer, ArrayList<Point>> listElements = new HashMap<Integer, ArrayList<Point>>();
-	    	listElements = etatDuJeu.cherche(this.donnePosition(), taille, Plateau.CHERCHE_TOUT);
-	    	
-	    	ListIterator<Point> iter = listElements.get(1).listIterator();
-	    	
-	    	System.out.println("Points où il y a des Yourt : ");
-	    	int i = 0;
-	    	while (iter.hasNext()|| i < 50) {
-	    		
-	    		System.out.println(iter.next());
+    		affiche("on cherche des champs");
+        	
+    		int plus_court_chemin = taillePlateau;
+    		Point prochain_point = null;
     		
-	    	}
-    	
+    		
+    		
+    		
+    		ArrayList<Node> listeChampAtteignableEtranger = new ArrayList<Node>();
+    		
+    		
+    		for(Node n : listeChampAtteignable) {
+    			
+    			int contenuCellule = etatDuJeu.	donneContenuCellule(n.getPosX(),n.getPosY());
+    			
+    			if( etatDuJeu.contientUnChampQuiNeLuiAppartientPas(this,contenuCellule))
+    				listeChampAtteignableEtranger.add(n);
+    		}
+    		
+    		
+        	for(Node n : listeChampAtteignableEtranger) {
+        		
+        		System.out.println("champ : "+n);
+        		Point point = new Point(n.getPosX(),n.getPosY());
+
+        		ArrayList<Node> cheminSansContrainte = etatDuJeu.donneCheminEntre(this.donnePosition(),point);
+            	System.out.println(cheminSansContrainte);
+
+            	ArrayList<Node> cheminAvecContrainteSupplementaires = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignable);
+            	System.out.println(cheminAvecContrainteSupplementaires);
+            	
+            	int taille = etatDuJeu.donneGrillePourAstar().length;
+
+            	
+            	ArrayList<Node> listeJoueurAtteignableComplet = utilitaire.obstaclesSupplementairesPersonnel(this.donnePosition(),taille,listeJoueurAtteignable);
+           	
+            	System.out.println("**********");
+            	
+            	System.out.println("avant ajout obstacle : " +listeJoueurAtteignable);
+            	System.out.println("apre ajout obstacle : " +listeJoueurAtteignableComplet);
+            	
+            	System.out.println("**********");
+           	
+            	
+            	ArrayList<Node> cheminAvecContrainteSupplementairesFinal = etatDuJeu.donneCheminAvecObstaclesSupplementaires(this.donnePosition(), point, listeJoueurAtteignableComplet);
+            	System.out.println("Chemin Yourt sans eviter joueur : >"+cheminAvecContrainteSupplementaires);    
+            	System.out.println("Chemin Yourt evitant joueur : >>"+cheminAvecContrainteSupplementairesFinal);    
+
+            	if ( cheminAvecContrainteSupplementairesFinal.size() < plus_court_chemin)
+            	{
+            		plus_court_chemin = cheminAvecContrainteSupplementairesFinal.size();
+            		prochain_point = new Point(cheminAvecContrainteSupplementairesFinal.get(0).getPosX(),cheminAvecContrainteSupplementairesFinal.get(0).getPosY());
+            	}
+        	}
+        	
+        	if (prochain_point==null)
+        		return super.faitUneAction(etatDuJeu);
+        	
+        	Action prochaine_action= utilitaire.deplacement(this.donnePosition(), prochain_point);
+        	
+        	if(prochaine_action !=null)
+        		return prochaine_action;
+        	else
+        		return super.faitUneAction(etatDuJeu);
+
     		
     	}
     	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-    	
-				
-	
-    	
-        return super.faitUneAction(etatDuJeu);
+    
     }
 }
