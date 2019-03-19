@@ -21,20 +21,20 @@ import jeu.Joueur;
 import jeu.astar.Node;
 
 public class AreneSolo {
-	public static final String PLATEAU_FK_PETIT = 
+	public static final String	PLATEAU_FK_PETIT = 
             "+----------------+\n"+
-            "|$$  F-@2    $$  |\n"+
-            "|  @1    F-  @3$-|\n"+
+            "|$$  F-      $$  |\n"+
+            "|  @1    F-    $-|\n"+
             "|##          ##  |\n"+
             "|  ##########  ##|\n"+
-            "|                |\n"+
+            "|        @2    @3|\n"+
             "|  @4    F-      |\n"+
             "|              F-|\n"+
             "|  ##  ######    |\n"+
             "+----------------+";
     
     public static void main(String[] args) {
-        //Plateau p = new Plateau( 100, PLATEAU_FK_PETIT);
+       // Plateau p = new Plateau( 100, PLATEAU_FK_PETIT);
         Plateau p = new Plateau( 1200, MaitreDuJeuFK.PLATEAU_FK_DEFAUT);
         MaitreDuJeuFK jeu = new MaitreDuJeuFK(p);
         jeu.metJoueurEnPosition(0, new MonJoueur("Moi"));

@@ -13,175 +13,65 @@ import jeu.astar.Node;
 
 public class Utils {
 	
-	
-	
-	
-	public Action ActionVigeurCritique(Point actuel, HashMap<Integer, ArrayList<Point>> listYourt, HashMap<Integer, ArrayList<Point>> listJoueurs, int taille, Plateau etatDuJeu)
-	{
-    	Point HillLePluisProche = null;
-		Point Hill;
-		int distance=0;
-		int distanceLaPlusCourte=taille;
-		
-		Iterator<Entry<Integer, ArrayList<Point>>> iterYourteGeneral = listYourt.entrySet().iterator();
-		
-		while (iterYourteGeneral.hasNext()) {
-			Iterator<Point> iterYourtPoints = iterYourteGeneral.next().getValue().iterator();
-			
-			while(iterYourtPoints.hasNext()) {
-				
-				Hill = iterYourtPoints.next();
-				
-				if(etatDuJeu.donneCheminAvecObstaclesSupplementaires(Hill, actuel,this.getArbres(etatDuJeu))!=null) {
-					
-					distance = etatDuJeu.donneCheminAvecObstaclesSupplementaires(Hill,actuel,this.getArbres(etatDuJeu)).size();
-					
-					if (distance<distanceLaPlusCourte) {
-						HillLePluisProche = Hill;
-						distanceLaPlusCourte = distance;
-	
-						System.out.println("j'ai des Yourt");
-						}
-				}
-				
-			}
-		}
-		
-		listJoueurs = etatDuJeu.cherche(actuel, taille, Plateau.CHERCHE_JOUEUR);
-		System.out.println("lmist joueurs est il vide ? "+listJoueurs.size());
-		Iterator<Entry<Integer, ArrayList<Point>>> iterJoueurGeneral = listJoueurs.entrySet().iterator();
-		
-		
-		
-		while (iterJoueurGeneral.hasNext()) {
-			Iterator<Point> iterJoueurPoints = iterJoueurGeneral.next().getValue().iterator();
-			System.out.println("fetch 1 ");
-			
-			while(iterJoueurPoints.hasNext()) {
-				
-				System.out.println("fetch 2 ");
-				Hill = iterJoueurPoints.next();
-				
-				if(!Hill.equals(actuel)) {
-					
-					if(etatDuJeu.donneCheminAvecObstaclesSupplementaires(Hill, actuel,this.getArbres(etatDuJeu))!=null) {
-					
-						distance = etatDuJeu.donneCheminAvecObstaclesSupplementaires(Hill, actuel,this.getArbres(etatDuJeu)).size();
-	    				if ((distance<distanceLaPlusCourte)) {
-							System.out.println("j'ai des joueurs");
-	    					HillLePluisProche = Hill;
-	    					distanceLaPlusCourte = distance;
-	    				}
-					}
-    			}
-    		}
-		}
-		
-		//System.out.println("jusque ici tout vas bien");
-		
-		int x = etatDuJeu.donneCheminAvecObstaclesSupplementaires(actuel, HillLePluisProche, getArbres(etatDuJeu)).get(0).getPosX();
-		//System.out.println("x :"+x);
-		
-		int y = etatDuJeu.donneCheminAvecObstaclesSupplementaires(actuel, HillLePluisProche, getArbres(etatDuJeu)).get(0).getPosY();
-		//System.out.println("y : "+y);
-		
-		System.out.println("chemin destination : "+etatDuJeu.donneCheminAvecObstaclesSupplementaires(actuel, HillLePluisProche, getArbres(etatDuJeu)));
-		
-		
-		Point dest = new Point(x,y);
-		System.out.println("j'ai recuperer le point de destination suivant : "+dest);
-		System.out.println(dest.x + " " + dest.y);
-		return deplacement(actuel,dest);
-		
-    	
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public ArrayList<Node> getNosChamps(Plateau etatDuJeu) {
-		ArrayList<Node> listeArbres = new ArrayList<Node>();
-		for (int i = 0; i < etatDuJeu.donneGrillePourAstar().length; i++) {
-			for (int j = 0; j < etatDuJeu.donneGrillePourAstar().length; j++) {
-				if(etatDuJeu.donneContenuCellule(i, j)==Plateau.ENDROIT_CHAMP_J1) 
-					listeArbres.add(new Node(i,j));
-				
-			}
-		}
-		return null;
-	}
-	
-	
-	
-	
-	
-	
-	public ArrayList<Node> getArbres (Plateau etatDuJeu) {
-		ArrayList<Node> listeArbres = new ArrayList<Node>();
-		for (int i = 0; i < etatDuJeu.donneGrillePourAstar().length; i++) {
-			for (int j = 0; j < etatDuJeu.donneGrillePourAstar().length; j++) {
-				if(etatDuJeu.donneContenuCellule(i, j)==Plateau.ENDROIT_INFRANCHISSABLE)
-					listeArbres.add(new Node(i,j));
-				
-			}
-		}
-		return null;
-	}
-	
-	
-	
-	
-	
-	/* les points de notre map accessible, c'est a dire sans arbres sur notre chemin
-	 * ( prend en compte le cas des objets dans des zones infranchissable )
+	/*
+	 * Methode d'affichage demandes qui remplace System.out.println();
 	 * 
-	 * @param etatDuJeu
-	 * 
-	 * @param cherche_object : noter objet Plateau.CHERCHE_CHAMP ....
-	 * 
-	 * @return une ArrayList des objets atteignable 
 	 */
+	public void affiche(String msg){
+		System.out.println(msg);
+	}
 	
+	/* Cette methode nous renvoi les points de notre map accessible, c'est a dire sans arbres sur notre chemin
+	 * et sa prend en compte le cas des objets dans des zones infranchissable
+	 * 
+	 * @param etatDuJeu : l'etat du jeu en cours
+	 * 
+	 * @param cherche_object : notre objet Plateau.CHERCHE_CHAMP ....
+	 * 
+	 * @return une ArrayList des objets '@param cherche_object' atteignable 
+	 */
     public ArrayList<Node> objetsAccessible(Point pActuel, Plateau etatDuJeu,int cherche_object){
     
-    	int taille = etatDuJeu.donneGrillePourAstar().length;
-    	
-    	HashMap<Integer, ArrayList<Point>> list = etatDuJeu.cherche(pActuel, taille, cherche_object);
-		
-    	Iterator<Map.Entry<Integer, ArrayList<Point>>> it = list.entrySet().iterator();
-
+    	// notre liste qui contient nos objets @param cherche_object atteignable
     	ArrayList<Node> listeObjetsAtteignable = new ArrayList();
     	
+    	int taille = etatDuJeu.donneGrillePourAstar().length;
+    	
+    	
+    	// on recupere une liste qui contient nos objets @param cherche_object
+    	
+    	HashMap<Integer, ArrayList<Point>> list = etatDuJeu.cherche(pActuel, taille, cherche_object);
+    	
+    	Iterator<Map.Entry<Integer, ArrayList<Point>>> it = list.entrySet().iterator();
+    	
+    	
+    	
+    	// on itere sur notre liste d'objets
+    	
     	while (it.hasNext()) {
+    		
     		Map.Entry<Integer, ArrayList<Point>> entry = it.next();
     		
     		Integer i = entry.getKey();
+    		
     		ArrayList<Point> al = entry.getValue();
     		
     		Iterator <Point> ital = al.iterator();
+    		
     		while (ital.hasNext()) {
-    			Point p = ital.next();
     			
-    			ArrayList<Node> chemin = etatDuJeu.donneCheminEntre(pActuel, p);
+    			Point destination = ital.next();
+    			
+    			ArrayList<Node> chemin = etatDuJeu.donneCheminEntre(pActuel, destination);
+    			
+    			// si un chemin existe entre notre 'position actuel' et la 'destination' alors on ajoute cette destination a notre liste
+    			
     			if(chemin!=null) {
-	    			int x = p.x;
-	    			int y = p.y;
-	    			//if(this.donnePosition().getX()!=x && this.donnePosition().getY()!=y) // on n'ajoute pas la position actuel comme obstacle
-	    				listeObjetsAtteignable.add(new Node(x, y));
+    				
+	    			int x = destination.x;
+	    			int y = destination.y;
+	    			
+	    			listeObjetsAtteignable.add(new Node(x, y));
     			}
        		}
     	    			
@@ -192,12 +82,16 @@ public class Utils {
     
     
 	/*
+	 * Cette fonction va retourner les positions des obstacles mais aussi les positions adjacent aux obstacles
 	 * 
+	 * @param posActuel : le Point a position 
 	 * 
-	 * cette fonction va les obstacles mais aussi les points adjacent aux obstacles
+	 * @param taille :
+	 * 
+	 * @return une ArrayList de tous les Points des objets '@param obstacles' a eviter mais aussi les Points des positions adjacentes a ces objets
 	 * 
 	 */
-	public ArrayList<Node> obstaclesSupplementairesPersonnel(Point p, int taille,ArrayList<Node> obstacles){
+	public ArrayList<Node> obstaclesSupplementairesPersonnel(Point posActuel, int taille, ArrayList<Node> obstacles){
 		
 		ArrayList<Node> obstaclesComplet = new ArrayList();
 		
@@ -207,7 +101,7 @@ public class Utils {
 			
 			int x = n.getPosX();
 			int y = n.getPosY();
-			if(p.getX()!=x && p.getY()!=y)	// on ne met pas en place la position courante comme un obstacle
+			if(posActuel.getX()!=x && posActuel.getY()!=y)	// on ne met pas en place la position courante comme un obstacle
 			{
 				if (x+1<taille)
 					obstaclesComplet.add(new Node(x+1,y));
@@ -226,7 +120,16 @@ public class Utils {
 	
 	
 	
-	
+	/*
+	 * cette methode retourne l'Action a faire pour permettre de se deplacer d'un point a un autre
+	 * 
+	 * @param actuel : le point actuel d'un joueur
+	 * 
+	 * @param dest : le point ou le joueur souhaite aller
+	 * 
+	 * @return l'Action a effectuer pour se rapprocher de la destination
+	 * 
+	 * */
 	public Action deplacement(Point actuel,Point dest) {
     	
     	System.out.println("je vais vers : "+dest);
@@ -252,7 +155,8 @@ public class Utils {
     		//sinon on va à haut
     		else return Action.HAUT;
     	}
-	return null;
+    	
+    	return null;
     }
 	
 	
