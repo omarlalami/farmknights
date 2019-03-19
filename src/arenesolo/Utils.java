@@ -129,27 +129,27 @@ public class Utils {
 	 * */
 	public Action deplacement(Point actuel,Point dest) {
     	
-    	System.out.println("je vais vers : "+dest);
+    	affiche("je vais vers : "+dest);
     	
     	//recuperation x et y du point courant
 		int myx = actuel.x;
     	int myy = actuel.y;
     	
     	//pour un deplacement de case en case on sait que uniquement 
-    	//une des deux coordonnées de la destination(x ou y) sera différente du X ou Y de la position courante
+    	//une des deux coordonnï¿½es de la destination(x ou y) sera diffï¿½rente du X ou Y de la position courante
     	
-    	//ici on test si c'est les X qui sont différents 
+    	//ici on test si c'est les X qui sont diffï¿½rents 
     	if (dest.x!=myx) {
-    		// si le x de la destination est supérieur on va à droite
+    		// si le x de la destination est supï¿½rieur on va ï¿½ droite
     		if (dest.x>myx) return Action.DROITE;
-    		//sinon on va à gauche
+    		//sinon on va ï¿½ gauche
     		else return Action.GAUCHE;
     	}
-    	//ici on test si c'est les Y qui sont différents 
+    	//ici on test si c'est les Y qui sont diffï¿½rents 
     	if (dest.y!=myy) {
-    		// si le x de la destination est supérieur on va en bas
+    		// si le y de la destination est supï¿½rieur on va en bas
     		if (dest.y>myy) return Action.BAS;
-    		//sinon on va à haut
+    		//sinon on va ï¿½ haut
     		else return Action.HAUT;
     	}
     	
